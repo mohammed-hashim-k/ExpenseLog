@@ -10,4 +10,6 @@ def initialize_databases():
     
     expense_Database.createtable("payment_method", payment_method_schema)
     expense_Database.createtable("expenses", expense_schema)
+    expense_Database.createtable("users", user_schema)
+    expense_Database.close_connections()
     

@@ -1,4 +1,8 @@
 
+user_schema = "id INTEGER PRIMARY KEY AUTOINCREMENT, \
+              username TEXT UNIQUE NOT NULL, \
+              password TEXT NOT NULL"
+
 payment_method_schema = "name TEXT PRIMARY KEY NOT NULL"
 
 

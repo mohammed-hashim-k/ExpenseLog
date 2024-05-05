@@ -4,9 +4,42 @@ from flask import Flask, request, jsonify
 from datetime import datetime
 import sqlite3
 from database import Database
+import hashlib
 
 # Initialize the Flask app
 app = Flask(__name__)
+
+
+# Register user route
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    password = hashlib.md5(password.encode()).hexdigest()
+    
+    user_Database = Database('expenses.db')
+    user_Database.insert('users','username, password',f"'{username}', '{password}'")
+    user_Database.close_connections()
+    return jsonify({'message': 'User registered successfully'}), 201
+
+# Login user route
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    password = hashlib.md5(password.encode()).hexdigest()
+    
+    user_Database = Database('expenses.db')
+    user = user_Database.select_where('users','*',f"username = '{username}' AND password = '{password}'")
+    user_Database.close_connections()
+    if user:
+        return jsonify({'message': 'User logged in successfully'}), 200
+    else:
+        return jsonify({'message': 'Invalid credentials'}), 401
+
+
 
 # Add expense route
 @app.route('/expenses', methods=['POST'])
@@ -25,6 +58,7 @@ def add_expense():
     expense_Database = Database('expenses.db')
     expense_Database.insert('expenses','category, amount, date, shop_name, description, currency, payment_method, location, receipt_url',
                             f"'{category}', {amount}, '{date}', '{shop_name}', '{description}', '{currency}', '{payment_method}', '{location}', '{receipt_url}'")
+    expense_Database.close_connections()
     return jsonify({'message': 'Expense added successfully'}), 201
 
 # Get all expenses route
@@ -32,6 +66,7 @@ def add_expense():
 def get_expenses():
     expense_Database = Database('expenses.db')
     expenses = expense_Database.select('expenses','*')
+    expense_Database.close_connections()
     return jsonify({'expenses': expenses}), 200
 
 # Get expense by ID route
@@ -39,6 +74,7 @@ def get_expenses():
 def get_expense_by_id(expense_id):
     expense_Database = Database('expenses.db')
     expense = expense_Database.select_where('expenses','*',f'id = {expense_id}')
+    expense_Database.close_connections()
     if expense:
         return jsonify({'expense': expense}), 200
     else:
@@ -51,5 +87,15 @@ def add_payment_method():
     name = data.get('name')
     
     payment_method_Database = Database('expenses.db')
-    payment_method_Database.insert('payment_methods','name',f"'{name}'")
+    payment_method_Database.insert('payment_method','name',f"'{name}'")
+    payment_method_Database.close_connections()
     return jsonify({'message': 'Payment method added successfully'}), 201
+
+# Get all payment methods route
+@app.route('/payment_methods', methods=['GET'])
+def get_payment_methods():
+    payment_method_Database = Database('expenses.db')
+    payment_methods = payment_method_Database.select('payment_method','*')
+    payment_method_Database.close_connections()
+    return jsonify({'payment_method': payment_methods}), 200
+

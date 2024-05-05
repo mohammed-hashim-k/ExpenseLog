@@ -7,9 +7,12 @@ class Database:
         print("Database : ",db_name)
         self.conn = sqlite3.connect(db_name)
         self.cursor = self.conn.cursor()
-    
-    
-            
+
+    def close_connections(self):
+        if self.conn:
+            self.conn.close()
+            print("Database Connection closed")
+
     def createtable(self,table_name,table_schema):
         self.cursor.execute(f'''
             CREATE TABLE IF NOT EXISTS {table_name} (
