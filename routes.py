@@ -5,9 +5,24 @@ from datetime import datetime
 import sqlite3
 from database import Database
 import hashlib
+import logging
 
 # Initialize the Flask app
 app = Flask(__name__)
+
+logging.basicConfig(filename="app.log", level = logging.INFO)
+
+@app.before_request
+def log_request_info():
+    logging.info('Request URL: %s', request.url)
+    logging.info('Request method: %s', request.method)
+    logging.info('Request data: %s', request.data)
+
+@app.after_request
+def log_response_info(response):
+    logging.info('Response status: %s', response.status_code)
+    return response
+
 
 
 # Register user route

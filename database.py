@@ -12,6 +12,10 @@ class Database:
         if self.conn:
             self.conn.close()
             print("Database Connection closed")
+                  
+    def create_indexes(self,index_name , index_column):
+        self.cursor.execute(f'''CREATE INDEX IF NOT EXISTS {index_name}  ON expenses ({index_column})''')
+        self.conn.commit()
 
     def createtable(self,table_name,table_schema):
         self.cursor.execute(f'''
